@@ -11,7 +11,16 @@ import { MessagesModule } from './messages/messages.module';
 import { ReviewsModule } from './reviews/reviews.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, GenresModule, ServicesModule, OrdersModule, PaymentsModule, MessagesModule, ReviewsModule],
+  imports: [
+    PrismaModule,
+    AuthModule,
+    GenresModule,
+    ServicesModule,
+    OrdersModule,
+    PaymentsModule,
+    MessagesModule,
+    ReviewsModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
