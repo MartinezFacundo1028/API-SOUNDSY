@@ -1,6 +1,7 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ServicesService } from './services.service';
 import { ListServicesDto } from './dto/list-services.dto';
+import { CreateServiceDto } from './dto/create-service.dto';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Services')
@@ -22,5 +23,12 @@ export class ServicesController {
   @ApiOkResponse({ description: 'Service detail' })
   getOne(@Param('id') id: string) {
     return this.service.getOne(id);
+  }
+
+  @Post(':ownerId')
+  @ApiOperation({ summary: 'Create a service' })
+  @ApiOkResponse({ description: 'Service created' })
+  create(@Param('ownerId') ownerId: string, @Body() body: CreateServiceDto) {
+    return this.service.create(body, ownerId);
   }
 }

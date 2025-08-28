@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { ListServicesDto } from './dto/list-services.dto';
+import { CreateServiceDto } from './dto/create-service.dto';
 
 @Injectable()
 export class ServicesService {
@@ -60,8 +61,8 @@ export class ServicesService {
     return { items, nextCursor, hasMore };
   }
 
-  getOne(id: string) {
-    return this.prisma.service.findUnique({
+  async getOne(id: string) {
+    const service = await this.prisma.service.findUnique({
       where: { id },
       include: {
         genres: { select: { name: true } },
@@ -74,5 +75,65 @@ export class ServicesService {
         samples: true,
       },
     });
+
+    if (!service) {
+      throw new NotFoundException('Service not found');
+    }
+
+    return service;
+  }
+
+  async create(dto: CreateServiceDto, ownerId: string) {
+    const { genres: genreNames, ...serviceData } = dto;
+
+    // Si hay géneros, validar que existan y conectarlos
+    let genreConnections = {};
+    if (genreNames && genreNames.length > 0) {
+      // 1. Buscar géneros existentes
+      const existingGenres = await this.prisma.genre.findMany({
+        where: { name: { in: genreNames } },
+      });
+
+      // 2. Verificar que todos los géneros existen
+      const existingNames = existingGenres.map((g) => g.name);
+      const missingNames = genreNames.filter(
+        (name) => !existingNames.includes(name),
+      );
+
+      // 3. Si hay géneros que no existen, lanzar error
+      if (missingNames.length > 0) {
+        throw new NotFoundException(
+          `Los siguientes géneros no existen: ${missingNames.join(', ')}. Usa solo géneros válidos.`,
+        );
+      }
+
+      // 4. Conectar solo géneros existentes
+      genreConnections = {
+        genres: {
+          connect: existingNames.map((name) => ({ name })),
+        },
+      };
+    }
+
+    // Crear el servicio
+    const service = await this.prisma.service.create({
+      data: {
+        ...serviceData,
+        ownerId,
+        ...genreConnections,
+      },
+      include: {
+        genres: { select: { name: true } },
+        owner: {
+          select: {
+            id: true,
+            profile: { select: { displayName: true, avatarUrl: true } },
+          },
+        },
+        samples: true,
+      },
+    });
+
+    return service;
   }
 }
