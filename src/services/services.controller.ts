@@ -1,15 +1,17 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
+  Put,
+  Patch,
   Query,
   UseGuards,
 } from '@nestjs/common';
 import { ServicesService } from './services.service';
-import { ListServicesDto } from './dto/list-services.dto';
-import { CreateServiceDto } from './dto/create-service.dto';
+import { ListServicesDto, CreateServiceDto, UpdateServiceDto } from './dto';
 import {
   ApiOkResponse,
   ApiOperation,
@@ -53,5 +55,73 @@ export class ServicesController {
   ) {
     console.log(user);
     return this.service.create(body, user.id);
+  }
+
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Actualizar servicio parcialmente (recomendado)',
+    description:
+      'Actualiza solo los campos enviados. Los demás se mantienen igual.',
+  })
+  @ApiOkResponse({ description: 'Servicio actualizado parcialmente' })
+  async updatePartial(
+    @Param('id') id: string,
+    @CurrentUser() user: CurrentUserTypeImport,
+    @Body() updateDto: UpdateServiceDto,
+  ) {
+    return this.service.updatePartial(id, updateDto, user.id);
+  }
+
+  @Put(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Reemplazar servicio completamente',
+    description:
+      'Reemplaza TODOS los datos del servicio. Campos no enviados se pierden.',
+  })
+  @ApiOkResponse({ description: 'Servicio reemplazado completamente' })
+  async replace(
+    @Param('id') id: string,
+    @CurrentUser() user: CurrentUserTypeImport,
+    @Body() createDto: CreateServiceDto,
+  ) {
+    return this.service.replace(id, createDto, user.id);
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Eliminar servicio',
+    description:
+      'Elimina permanentemente un servicio. Solo el dueño puede eliminar su propio servicio.',
+  })
+  @ApiOkResponse({
+    description: 'Servicio eliminado exitosamente',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string', example: 'Servicio eliminado exitosamente' },
+        deletedService: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', example: 'cmeun9kne00031io4a7n05fvv' },
+            title: {
+              type: 'string',
+              example: 'Grabación de guitarra acústica',
+            },
+          },
+        },
+      },
+    },
+  })
+  async delete(
+    @Param('id') id: string,
+    @CurrentUser() user: CurrentUserTypeImport,
+  ) {
+    return await this.service.delete(id, user.id);
   }
 }
