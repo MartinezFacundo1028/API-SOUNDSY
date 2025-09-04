@@ -7,7 +7,7 @@ import { GenresModule } from './genres/genres.module';
 import { ServicesModule } from './services/services.module';
 import { OrdersModule } from './orders/orders.module';
 import { PaymentsModule } from './payments/payments.module';
-import { MessagesModule } from './messages/messages.module';
+import { ChatModule } from './chat/chat.module';
 import { ReviewsModule } from './reviews/reviews.module';
 
 @Module({
@@ -18,7 +18,7 @@ import { ReviewsModule } from './reviews/reviews.module';
     ServicesModule,
     OrdersModule,
     PaymentsModule,
-    MessagesModule,
+    ChatModule,
     ReviewsModule,
   ],
   controllers: [AppController],
