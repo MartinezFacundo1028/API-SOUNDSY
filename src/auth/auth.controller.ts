@@ -36,7 +36,7 @@ export class AuthController {
     description: 'El email ya está registrado',
   })
   async register(@Body() registerDto: RegisterDto): Promise<AuthResponseDto> {
-    return this.authService.register(registerDto);
+    return await this.authService.register(registerDto);
   }
 
   @Post('login')
@@ -52,7 +52,7 @@ export class AuthController {
     description: 'Credenciales incorrectas',
   })
   async login(@Body() loginDto: LoginDto): Promise<AuthResponseDto> {
-    return this.authService.login(loginDto);
+    return await this.authService.login(loginDto);
   }
 
   @Get('me')
@@ -67,7 +67,7 @@ export class AuthController {
     status: 401,
     description: 'Token inválido o expirado',
   })
-  async getProfile(@CurrentUser() user: CurrentUserType) {
+  getProfile(@CurrentUser() user: CurrentUserType) {
     return {
       user,
     };

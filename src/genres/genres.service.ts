@@ -4,8 +4,12 @@ import { PrismaService } from '../prisma/prisma.service';
 @Injectable()
 export class GenresService {
   constructor(private prisma: PrismaService) {}
-  list() {
-    return this.prisma.genre.findMany({ orderBy: { name: 'asc' } });
+  async list() {
+    return await this.prisma.genre.findMany({ orderBy: { name: 'asc' } });
+  }
+
+  async getOne(id: string) {
+    return await this.prisma.genre.findUnique({ where: { id } });
   }
 
   async popular(limit = 12) {

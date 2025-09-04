@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { GenresService } from './genres.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
@@ -9,13 +9,21 @@ export class GenresController {
   @Get()
   @ApiOperation({ summary: 'List all genres' })
   @ApiResponse({ status: 200, description: 'List of all genres' })
-  list() {
-    return this.service.list();
+  async list() {
+    return await this.service.list();
   }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get a genre by id' })
+  @ApiResponse({ status: 200, description: 'Genre detail' })
+  async getOne(@Param('id') id: string) {
+    return await this.service.getOne(id);
+  }
+
   @Get('popular')
   @ApiOperation({ summary: 'List popular genres' })
   @ApiResponse({ status: 200, description: 'List of popular genres' })
-  popular() {
-    return this.service.popular();
+  async popular() {
+    return await this.service.popular();
   }
 }

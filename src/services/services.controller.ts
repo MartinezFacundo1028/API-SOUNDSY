@@ -33,15 +33,15 @@ export class ServicesController {
   @ApiOkResponse({
     description: 'List of services with optional filters and cursor pagination',
   })
-  list(@Query() query: ListServicesDto) {
-    return this.service.list(query);
+  async list(@Query() query: ListServicesDto) {
+    return await this.service.list(query);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get a service by id' })
   @ApiOkResponse({ description: 'Service detail' })
-  getOne(@Param('id') id: string) {
-    return this.service.getOne(id);
+  async getOne(@Param('id') id: string) {
+    return await this.service.getOne(id);
   }
 
   @Post()
@@ -49,12 +49,12 @@ export class ServicesController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a service' })
   @ApiOkResponse({ description: 'Service created' })
-  create(
+  async create(
     @CurrentUser() user: CurrentUserTypeImport,
     @Body() body: CreateServiceDto,
   ) {
     console.log(user);
-    return this.service.create(body, user.id);
+    return await this.service.create(body, user.id);
   }
 
   @Patch(':id')
@@ -71,7 +71,7 @@ export class ServicesController {
     @CurrentUser() user: CurrentUserTypeImport,
     @Body() updateDto: UpdateServiceDto,
   ) {
-    return this.service.updatePartial(id, updateDto, user.id);
+    return await this.service.updatePartial(id, updateDto, user.id);
   }
 
   @Put(':id')
@@ -88,7 +88,7 @@ export class ServicesController {
     @CurrentUser() user: CurrentUserTypeImport,
     @Body() createDto: CreateServiceDto,
   ) {
-    return this.service.replace(id, createDto, user.id);
+    return await this.service.replace(id, createDto, user.id);
   }
 
   @Delete(':id')
