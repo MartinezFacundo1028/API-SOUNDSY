@@ -103,6 +103,7 @@ model Order {
   updatedAt DateTime @updatedAt
   Chat      Chat?
   Review    Review?
+  Payment   Payment[]
 }
 
 model Chat {
@@ -126,6 +127,21 @@ model Message {
   createdAt   DateTime  @default(now())
 
   @@index([chatId, createdAt])
+}
+
+model Payment {
+  id             String   @id @default(cuid())
+  orderId        String
+  order          Order    @relation(fields: [orderId], references: [id])
+  amount         Int
+  currency       String
+  paymentMethod  String
+  status         String   @default("pending") // pending, processing, completed, failed, refunded
+  paymentIntentId String?
+  transactionId  String?
+  description    String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 model Review {
