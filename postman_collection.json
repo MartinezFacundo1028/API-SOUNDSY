@@ -1,0 +1,544 @@
+{
+  "info": {
+    "name": "Soundsy API - Complete Collection",
+    "description": "Colección completa de endpoints para Soundsy API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwt_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "YOUR_JWT_TOKEN_HERE",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"BUYER\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "Create Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"order_123\",\n  \"rating\": 5,\n  \"comment\": \"Excelente trabajo, muy profesional\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/reviews",
+              "host": ["{{base_url}}"],
+              "path": ["reviews"]
+            }
+          }
+        },
+        {
+          "name": "Get User Reviews",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/reviews",
+              "host": ["{{base_url}}"],
+              "path": ["reviews"]
+            }
+          }
+        },
+        {
+          "name": "Get Reviews by Service",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/reviews?serviceId=service_123",
+              "host": ["{{base_url}}"],
+              "path": ["reviews"],
+              "query": [
+                {
+                  "key": "serviceId",
+                  "value": "service_123"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Review by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/reviews/review_123",
+              "host": ["{{base_url}}"],
+              "path": ["reviews", "review_123"]
+            }
+          }
+        },
+        {
+          "name": "Update Review",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 4,\n  \"comment\": \"Buen trabajo, pero podría mejorar\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/reviews/review_123",
+              "host": ["{{base_url}}"],
+              "path": ["reviews", "review_123"]
+            }
+          }
+        },
+        {
+          "name": "Delete Review",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/reviews/review_123",
+              "host": ["{{base_url}}"],
+              "path": ["reviews", "review_123"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Deliveries",
+      "item": [
+        {
+          "name": "Create Delivery",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "multipart/form-data"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "orderId",
+                  "value": "order_123",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Entrega del trabajo completado",
+                  "type": "text"
+                },
+                {
+                  "key": "files",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/deliveries",
+              "host": ["{{base_url}}"],
+              "path": ["deliveries"]
+            }
+          }
+        },
+        {
+          "name": "Get User Deliveries",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/deliveries",
+              "host": ["{{base_url}}"],
+              "path": ["deliveries"]
+            }
+          }
+        },
+        {
+          "name": "Get Delivery by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/deliveries/delivery_123",
+              "host": ["{{base_url}}"],
+              "path": ["deliveries", "delivery_123"]
+            }
+          }
+        },
+        {
+          "name": "Update Delivery",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "multipart/form-data"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "description",
+                  "value": "Descripción actualizada",
+                  "type": "text"
+                },
+                {
+                  "key": "files",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/deliveries/delivery_123",
+              "host": ["{{base_url}}"],
+              "path": ["deliveries", "delivery_123"]
+            }
+          }
+        },
+        {
+          "name": "Approve Delivery",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/deliveries/delivery_123/approve",
+              "host": ["{{base_url}}"],
+              "path": ["deliveries", "delivery_123", "approve"]
+            }
+          }
+        },
+        {
+          "name": "Request Revision",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"feedback\": \"Necesito cambios en el coro\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/deliveries/delivery_123/request-revision",
+              "host": ["{{base_url}}"],
+              "path": ["deliveries", "delivery_123", "request-revision"]
+            }
+          }
+        },
+        {
+          "name": "Download File",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/deliveries/delivery_123/files/file_456/download",
+              "host": ["{{base_url}}"],
+              "path": ["deliveries", "delivery_123", "files", "file_456", "download"]
+            }
+          }
+        },
+        {
+          "name": "Get Deliveries by Order",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/deliveries/order/order_123",
+              "host": ["{{base_url}}"],
+              "path": ["deliveries", "order", "order_123"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Get User Notifications",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/notifications",
+              "host": ["{{base_url}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "Get Notifications with Pagination",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/notifications?limit=10&offset=0",
+              "host": ["{{base_url}}"],
+              "path": ["notifications"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{base_url}}/notifications/notification_123/read",
+              "host": ["{{base_url}}"],
+              "path": ["notifications", "notification_123", "read"]
+            }
+          }
+        },
+        {
+          "name": "Mark All as Read",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{base_url}}/notifications/read-all",
+              "host": ["{{base_url}}"],
+              "path": ["notifications", "read-all"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"serviceId\": \"service_123\",\n  \"sellerId\": \"seller_456\",\n  \"amount\": 5000,\n  \"currency\": \"USD\",\n  \"paymentRef\": \"pay_1234567890\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/orders",
+              "host": ["{{base_url}}"],
+              "path": ["orders"]
+            }
+          }
+        },
+        {
+          "name": "Get User Orders",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/orders",
+              "host": ["{{base_url}}"],
+              "path": ["orders"]
+            }
+          }
+        },
+        {
+          "name": "Get Order by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/orders/order_123",
+              "host": ["{{base_url}}"],
+              "path": ["orders", "order_123"]
+            }
+          }
+        },
+        {
+          "name": "Update Order",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"COMPLETED\",\n  \"paymentRef\": \"pay_updated_123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/orders/order_123",
+              "host": ["{{base_url}}"],
+              "path": ["orders", "order_123"]
+            }
+          }
+        },
+        {
+          "name": "Cancel Order",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/orders/order_123",
+              "host": ["{{base_url}}"],
+              "path": ["orders", "order_123"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "Create Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"order_123\",\n  \"paymentMethod\": \"stripe\",\n  \"amount\": 5000,\n  \"currency\": \"USD\",\n  \"paymentIntentId\": \"pi_1234567890\",\n  \"transactionId\": \"txn_1234567890\",\n  \"description\": \"Pago por servicio de música\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/payments",
+              "host": ["{{base_url}}"],
+              "path": ["payments"]
+            }
+          }
+        },
+        {
+          "name": "Get User Payments",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/payments",
+              "host": ["{{base_url}}"],
+              "path": ["payments"]
+            }
+          }
+        },
+        {
+          "name": "Get Payment by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/payments/payment_123",
+              "host": ["{{base_url}}"],
+              "path": ["payments", "payment_123"]
+            }
+          }
+        },
+        {
+          "name": "Update Payment",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"completed\",\n  \"transactionId\": \"txn_updated_123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/payments/payment_123",
+              "host": ["{{base_url}}"],
+              "path": ["payments", "payment_123"]
+            }
+          }
+        },
+        {
+          "name": "Process Refund",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/payments/payment_123/refund",
+              "host": ["{{base_url}}"],
+              "path": ["payments", "payment_123", "refund"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

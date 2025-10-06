@@ -9,6 +9,8 @@ import { OrdersModule } from './orders/orders.module';
 import { PaymentsModule } from './payments/payments.module';
 import { ChatModule } from './chat/chat.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { DeliveriesModule } from './deliveries/deliveries.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { ReviewsModule } from './reviews/reviews.module';
     PaymentsModule,
     ChatModule,
     ReviewsModule,
+    DeliveriesModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

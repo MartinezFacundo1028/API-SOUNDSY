@@ -23,6 +23,20 @@ enum OrderStatus {
   DISPUTED
 }
 
+enum DeliveryStatus {
+  DELIVERED
+  APPROVED
+  REVISION_REQUIRED
+}
+
+enum NotificationType {
+  DELIVERY_RECEIVED
+  DELIVERY_APPROVED
+  REVISION_REQUESTED
+  CHAT_MESSAGE
+  ORDER_STATUS_CHANGE
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -36,6 +50,9 @@ model User {
   ordersBuyer  Order[]   @relation("OrdersAsBuyer")
   ordersSeller Order[]   @relation("OrdersAsSeller")
   reviews      Review[]
+  deliveriesAsSeller Delivery[] @relation("DeliveriesAsSeller")
+  deliveriesAsBuyer  Delivery[] @relation("DeliveriesAsBuyer")
+  notifications Notification[]
 }
 
 model Profile {
@@ -104,6 +121,7 @@ model Order {
   Chat      Chat?
   Review    Review?
   Payment   Payment[]
+  Delivery  Delivery[]
 }
 
 model Chat {
@@ -153,4 +171,42 @@ model Review {
   createdAt DateTime @default(now())
   User      User?    @relation(fields: [userId], references: [id])
   userId    String?
+}
+
+model Delivery {
+  id                   String         @id @default(cuid())
+  orderId              String
+  order                Order         @relation(fields: [orderId], references: [id])
+  sellerId             String
+  seller               User          @relation("DeliveriesAsSeller", fields: [sellerId], references: [id])
+  buyerId              String
+  buyer                User          @relation("DeliveriesAsBuyer", fields: [buyerId], references: [id])
+  description          String
+  files                Json          // Array de archivos con metadata
+  status               DeliveryStatus @default(DELIVERED)
+  deliveryDate         DateTime
+  approvedAt           DateTime?
+  revisionRequestedAt DateTime?
+  feedback             String?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  @@index([orderId])
+  @@index([sellerId])
+  @@index([buyerId])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id])
+  type      NotificationType
+  title     String
+  message   String
+  data      Json?            // Datos adicionales como IDs, etc.
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
 }

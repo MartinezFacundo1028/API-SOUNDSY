@@ -5,6 +5,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import {
   SendMessageDto,
   ListChatsDto,
@@ -15,7 +16,10 @@ import {
 
 @Injectable()
 export class ChatService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationsService: NotificationsService,
+  ) {}
 
   /**
    * Lista todos los chats del usuario autenticado
@@ -272,6 +276,36 @@ export class ChatService {
         body: dto.body.trim(),
         attachments: dto.attachments || undefined,
       },
+    });
+
+    // Obtener información del chat para notificaciones
+    const chatInfo = await this.prisma.chat.findUnique({
+      where: { id: chatId },
+      include: {
+        order: {
+          include: {
+            service: true,
+            buyer: true,
+            seller: true
+          }
+        }
+      }
+    });
+
+    // Determinar el destinatario
+    const recipientId = chatInfo?.buyerId === senderId ? chatInfo?.sellerId : chatInfo?.buyerId;
+
+    if (!recipientId) {
+      throw new BadRequestException('No se pudo determinar el destinatario del mensaje');
+    }
+
+    // Enviar notificación de chat
+    await this.notificationsService.sendChatNotification({
+      recipientId,
+      senderId,
+      message: dto.body.trim(),
+      chatId,
+      deliveryId: dto.attachments?.deliveryId // Si el mensaje incluye referencia a entrega
     });
 
     return {
