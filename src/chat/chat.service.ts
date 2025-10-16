@@ -442,4 +442,47 @@ export class ChatService {
 
     return { chatId: chat.id };
   }
+
+  /**
+   * Sube archivos para un chat específico
+   */
+  async uploadFiles(chatId: string, userId: string, files: any[]): Promise<{ files: any[] }> {
+    // Verificar que el chat existe y el usuario tiene permisos
+    const chat = await this.prisma.chat.findUnique({
+      where: { id: chatId },
+    });
+
+    if (!chat) {
+      throw new NotFoundException('Chat no encontrado');
+    }
+
+    // Verificar que el usuario es participante del chat
+    if (chat.buyerId !== userId && chat.sellerId !== userId) {
+      throw new ForbiddenException('No tienes permisos para subir archivos a este chat');
+    }
+
+    if (!files || files.length === 0) {
+      throw new BadRequestException('No se proporcionaron archivos');
+    }
+
+    // Procesar archivos subidos
+    const processedFiles = files.map(file => {
+      const fileId = `file_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const fileExtension = file.originalname.split('.').pop();
+      const newFilename = `${fileId}.${fileExtension}`;
+      
+      return {
+        id: fileId,
+        filename: file.originalname,
+        mimeType: file.mimetype,
+        size: file.size,
+        path: file.path,
+        url: `/chats/files/${newFilename}`,
+        uploadedAt: new Date().toISOString(),
+        uploadedBy: userId,
+      };
+    });
+
+    return { files: processedFiles };
+  }
 }

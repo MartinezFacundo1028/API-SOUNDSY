@@ -2,10 +2,14 @@ import { Injectable, NotFoundException, ForbiddenException, BadRequestException 
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateOrderDto, UpdateOrderDto, OrderResponseDto } from './dto';
 import { OrderStatus } from '@prisma/client';
+import { ChatService } from '../chat/chat.service';
 
 @Injectable()
 export class OrdersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private chatService: ChatService
+  ) {}
 
   async createOrder(dto: CreateOrderDto, buyerId: string): Promise<OrderResponseDto> {
     // Verificar que el servicio existe
@@ -62,7 +66,43 @@ export class OrdersService {
       },
     });
 
-    return this.mapToResponseDto(order);
+    // Crear chat automáticamente para la orden
+    let updatedOrder = order;
+    try {
+      const { chatId } = await this.chatService.createChatForOrder(order.id);
+      
+      // Actualizar la orden con el chatId
+      updatedOrder = await this.prisma.order.update({
+        where: { id: order.id },
+        data: { chatId },
+        include: {
+          service: {
+            include: {
+              owner: {
+                include: {
+                  profile: true,
+                },
+              },
+            },
+          },
+          buyer: {
+            include: {
+              profile: true,
+            },
+          },
+          seller: {
+            include: {
+              profile: true,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      console.warn('Error creando chat para la orden:', error);
+      // No fallar la creación de la orden si hay error con el chat
+    }
+
+    return this.mapToResponseDto(updatedOrder);
   }
 
   async getOrdersByUser(userId: string, userRole: string): Promise<OrderResponseDto[]> {

@@ -7,7 +7,10 @@ import {
   Query,
   Body,
   UseGuards,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import {
   ApiTags,
   ApiOperation,
@@ -137,6 +140,56 @@ export class ChatController {
     @Body() sendMessageDto: SendMessageDto,
   ): Promise<MessageResponseDto> {
     return await this.chatService.sendMessage(chatId, user.id, sendMessageDto);
+  }
+
+  @Post(':id/upload')
+  @UseInterceptors(FilesInterceptor('files', 5)) // Máximo 5 archivos
+  @ApiOperation({
+    summary: 'Subir archivos para el chat',
+    description:
+      'Sube archivos que se pueden adjuntar a mensajes del chat. Devuelve las URLs para usar en los mensajes.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID del chat',
+    example: 'cm2chat123def456ghi789',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Archivos subidos exitosamente',
+    schema: {
+      type: 'object',
+      properties: {
+        files: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'string', example: 'file_123456789' },
+              filename: { type: 'string', example: 'demo.mp3' },
+              mimeType: { type: 'string', example: 'audio/mpeg' },
+              size: { type: 'number', example: 2048576 },
+              url: { type: 'string', example: '/chats/files/demo_123456789.mp3' },
+            },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Sin permisos para subir archivos a este chat',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Chat no encontrado',
+  })
+  async uploadFiles(
+    @Param('id') chatId: string,
+    @CurrentUser() user: CurrentUserType,
+    @UploadedFiles() files: any[],
+  ): Promise<{ files: any[] }> {
+    return await this.chatService.uploadFiles(chatId, user.id, files);
   }
 
   @Patch(':chatId/messages/:messageId/read')
