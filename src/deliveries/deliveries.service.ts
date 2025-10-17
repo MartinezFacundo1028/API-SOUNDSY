@@ -2,12 +2,14 @@ import { Injectable, NotFoundException, ForbiddenException, BadRequestException 
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateDeliveryDto, UpdateDeliveryDto, DeliveryResponseDto } from './dto';
 import { DeliveryStatus } from '@prisma/client';
+import { NotificationsService } from '../notifications/notifications.service';
 
 
 @Injectable()
 export class DeliveriesService {
   constructor(
     private prisma: PrismaService,
+    private notificationsService: NotificationsService,
   ) {}
 
   async createDelivery(dto: CreateDeliveryDto, userId: string): Promise<DeliveryResponseDto> {
@@ -69,8 +71,14 @@ export class DeliveriesService {
       data: { status: 'DELIVERED' }
     });
 
-    // TODO: Implementar notificaciones
-    console.log(`📦 Entrega creada: ${delivery.id} para orden ${dto.orderId}`);
+    // Enviar notificación de entrega al comprador
+    await this.notificationsService.sendDeliveryNotification({
+      buyerId: order.buyerId,
+      sellerId: order.sellerId,
+      orderId: dto.orderId,
+      deliveryId: delivery.id,
+      serviceName: order.service.title
+    });
 
     return this.mapToResponseDto(delivery);
   }
@@ -228,8 +236,13 @@ export class DeliveriesService {
       data: { status: 'COMPLETED' }
     });
 
-    // TODO: Implementar notificaciones
-    console.log(`✅ Entrega aprobada: ${deliveryId} por usuario ${userId}`);
+    // Enviar notificación de aprobación al vendedor
+    await this.notificationsService.sendApprovalNotification({
+      sellerId: delivery.sellerId,
+      buyerId: delivery.buyerId,
+      orderId: delivery.orderId,
+      deliveryId: deliveryId
+    });
 
     return this.mapToResponseDto(updatedDelivery);
   }
@@ -271,8 +284,14 @@ export class DeliveriesService {
       }
     });
 
-    // TODO: Implementar notificaciones
-    console.log(`🔄 Revisión solicitada: ${deliveryId} por usuario ${userId}`);
+    // Enviar notificación de revisión al vendedor
+    await this.notificationsService.sendRevisionNotification({
+      sellerId: delivery.sellerId,
+      buyerId: delivery.buyerId,
+      orderId: delivery.orderId,
+      deliveryId: deliveryId,
+      feedback: dto.feedback
+    });
 
     return this.mapToResponseDto(updatedDelivery);
   }
