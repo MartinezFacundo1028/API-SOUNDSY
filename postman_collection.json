@@ -1,8 +1,9 @@
 {
   "info": {
     "name": "Soundsy API - Complete Collection",
-    "description": "Colección completa de endpoints para Soundsy API",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    "description": "Colección completa de endpoints para Soundsy API - Plataforma de servicios musicales",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "2.0.0"
   },
   "auth": {
     "type": "bearer",
@@ -17,7 +18,7 @@
   "variable": [
     {
       "key": "base_url",
-      "value": "http://localhost:3000",
+      "value": "http://localhost:3001/api/v1",
       "type": "string"
     },
     {
@@ -28,10 +29,11 @@
   ],
   "item": [
     {
-      "name": "Auth",
+      "name": "🔐 Authentication",
+      "description": "Endpoints para registro, login y autenticación de usuarios",
       "item": [
         {
-          "name": "Register",
+          "name": "Register User",
           "request": {
             "method": "POST",
             "header": [
@@ -42,17 +44,18 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"BUYER\"\n}"
+              "raw": "{\n  \"email\": \"musico@soundsy.test\",\n  \"password\": \"password123\",\n  \"role\": \"MUSICIAN\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/auth/register",
               "host": ["{{base_url}}"],
               "path": ["auth", "register"]
-            }
+            },
+            "description": "Registra un nuevo usuario en la plataforma. Roles disponibles: BUYER, MUSICIAN, ADMIN"
           }
         },
         {
-          "name": "Login",
+          "name": "Login User",
           "request": {
             "method": "POST",
             "header": [
@@ -63,82 +66,37 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+              "raw": "{\n  \"email\": \"musico@soundsy.test\",\n  \"password\": \"password123\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/auth/login",
               "host": ["{{base_url}}"],
               "path": ["auth", "login"]
-            }
+            },
+            "description": "Inicia sesión y obtiene el JWT token para autenticación"
           }
         }
       ]
     },
     {
-      "name": "Reviews",
+      "name": "👤 Profile Management",
+      "description": "Gestión de perfiles de usuario",
       "item": [
         {
-          "name": "Create Review",
+          "name": "Get Profile",
           "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"orderId\": \"order_123\",\n  \"rating\": 5,\n  \"comment\": \"Excelente trabajo, muy profesional\"\n}"
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/profile",
+              "host": ["{{base_url}}"],
+              "path": ["profile"]
             },
-            "url": {
-              "raw": "{{base_url}}/reviews",
-              "host": ["{{base_url}}"],
-              "path": ["reviews"]
-            }
+            "description": "Obtiene el perfil del usuario autenticado"
           }
         },
         {
-          "name": "Get User Reviews",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/reviews",
-              "host": ["{{base_url}}"],
-              "path": ["reviews"]
-            }
-          }
-        },
-        {
-          "name": "Get Reviews by Service",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/reviews?serviceId=service_123",
-              "host": ["{{base_url}}"],
-              "path": ["reviews"],
-              "query": [
-                {
-                  "key": "serviceId",
-                  "value": "service_123"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get Review by ID",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/reviews/review_123",
-              "host": ["{{base_url}}"],
-              "path": ["reviews", "review_123"]
-            }
-          }
-        },
-        {
-          "name": "Update Review",
+          "name": "Update Profile",
           "request": {
             "method": "PATCH",
             "header": [
@@ -149,52 +107,244 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"rating\": 4,\n  \"comment\": \"Buen trabajo, pero podría mejorar\"\n}"
+              "raw": "{\n  \"displayName\": \"Demo Musician\",\n  \"bio\": \"Productor musical especializado en mezcla y masterización\",\n  \"instruments\": [\"guitarra\", \"piano\", \"batería\"],\n  \"links\": {\n    \"spotify\": \"https://spotify.com/artist/demo\",\n    \"soundcloud\": \"https://soundcloud.com/demo\"\n  }\n}"
             },
             "url": {
-              "raw": "{{base_url}}/reviews/review_123",
+              "raw": "{{base_url}}/profile",
               "host": ["{{base_url}}"],
-              "path": ["reviews", "review_123"]
-            }
-          }
-        },
-        {
-          "name": "Delete Review",
-          "request": {
-            "method": "DELETE",
-            "url": {
-              "raw": "{{base_url}}/reviews/review_123",
-              "host": ["{{base_url}}"],
-              "path": ["reviews", "review_123"]
-            }
+              "path": ["profile"]
+            },
+            "description": "Actualiza el perfil del usuario autenticado"
           }
         }
       ]
     },
     {
-      "name": "Deliveries",
+      "name": "🎵 Services",
+      "description": "Gestión de servicios musicales",
       "item": [
         {
-          "name": "Create Delivery",
+          "name": "List Services",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services?limit=20&cursor=",
+              "host": ["{{base_url}}"],
+              "path": ["services"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "cursor",
+                  "value": ""
+                },
+                {
+                  "key": "genre",
+                  "value": "Rock",
+                  "disabled": true
+                },
+                {
+                  "key": "instrument",
+                  "value": "guitarra",
+                  "disabled": true
+                },
+                {
+                  "key": "musicianId",
+                  "value": "user_id_here",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Lista servicios con filtros opcionales. Incluye paginación con cursor"
+          }
+        },
+        {
+          "name": "Get Service by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/{{service_id}}?includeReviews=true",
+              "host": ["{{base_url}}"],
+              "path": ["services", "{{service_id}}"],
+              "query": [
+                {
+                  "key": "includeReviews",
+                  "value": "true",
+                  "description": "Incluir reviews del servicio"
+                }
+              ]
+            },
+            "description": "Obtiene un servicio específico. Opcionalmente incluye reviews"
+          }
+        },
+        {
+          "name": "Create Service",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
-                "value": "multipart/form-data"
+                "value": "application/json"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Mezcla Profesional\",\n  \"description\": \"Servicio de mezcla profesional con 2 revisiones incluidas\",\n  \"basePrice\": 5000,\n  \"currency\": \"USD\",\n  \"deliveryDays\": 7,\n  \"tags\": [\"mezcla\", \"masterización\", \"profesional\"],\n  \"genres\": [\"Rock\", \"Pop\", \"Electronic\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services",
+              "host": ["{{base_url}}"],
+              "path": ["services"]
+            },
+            "description": "Crea un nuevo servicio musical. Solo músicos pueden crear servicios"
+          }
+        },
+        {
+          "name": "Update Service (Partial)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Mezcla Profesional Premium\",\n  \"basePrice\": 7500\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/{{service_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["services", "{{service_id}}"]
+            },
+            "description": "Actualiza parcialmente un servicio. Solo campos enviados se actualizan"
+          }
+        },
+        {
+          "name": "Replace Service (Complete)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Nuevo Servicio\",\n  \"description\": \"Descripción completamente nueva\",\n  \"basePrice\": 3000,\n  \"currency\": \"USD\",\n  \"deliveryDays\": 5,\n  \"tags\": [\"nuevo\", \"servicio\"],\n  \"genres\": [\"Jazz\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/{{service_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["services", "{{service_id}}"]
+            },
+            "description": "Reemplaza completamente un servicio. Todos los campos se actualizan"
+          }
+        },
+        {
+          "name": "Delete Service",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/{{service_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["services", "{{service_id}}"]
+            },
+            "description": "Elimina un servicio. Solo el propietario puede eliminarlo"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🛒 Orders",
+      "description": "Gestión de órdenes y compras",
+      "item": [
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"serviceId\": \"{{service_id}}\",\n  \"sellerId\": \"{{seller_id}}\",\n  \"amount\": 5000,\n  \"currency\": \"USD\",\n  \"paymentRef\": \"payment_123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/orders",
+              "host": ["{{base_url}}"],
+              "path": ["orders"]
+            },
+            "description": "Crea una nueva orden. Automáticamente crea un chat para comunicación"
+          }
+        },
+        {
+          "name": "Get User Orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/orders",
+              "host": ["{{base_url}}"],
+              "path": ["orders"]
+            },
+            "description": "Obtiene todas las órdenes del usuario autenticado"
+          }
+        },
+        {
+          "name": "Update Order Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"IN_PROGRESS\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/orders/{{order_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["orders", "{{order_id}}"]
+            },
+            "description": "Actualiza el estado de una orden. Estados: PENDING_PAYMENT, PAID, IN_PROGRESS, DELIVERED, COMPLETED, CANCELED, DISPUTED"
+          }
+        }
+      ]
+    },
+    {
+      "name": "📦 Deliveries",
+      "description": "Gestión de entregas de trabajos",
+      "item": [
+        {
+          "name": "Create Delivery",
+          "request": {
+            "method": "POST",
+            "header": [],
             "body": {
               "mode": "formdata",
               "formdata": [
                 {
                   "key": "orderId",
-                  "value": "order_123",
+                  "value": "{{order_id}}",
                   "type": "text"
                 },
                 {
                   "key": "description",
-                  "value": "Entrega del trabajo completado",
+                  "value": "Aquí está tu mezcla final con todos los stems",
                   "type": "text"
                 },
                 {
@@ -208,41 +358,41 @@
               "raw": "{{base_url}}/deliveries",
               "host": ["{{base_url}}"],
               "path": ["deliveries"]
-            }
+            },
+            "description": "Crea una entrega con archivos. Solo el vendedor puede entregar. Máximo 10 archivos"
           }
         },
         {
           "name": "Get User Deliveries",
           "request": {
             "method": "GET",
+            "header": [],
             "url": {
               "raw": "{{base_url}}/deliveries",
               "host": ["{{base_url}}"],
               "path": ["deliveries"]
-            }
+            },
+            "description": "Obtiene todas las entregas del usuario autenticado"
           }
         },
         {
           "name": "Get Delivery by ID",
           "request": {
             "method": "GET",
+            "header": [],
             "url": {
-              "raw": "{{base_url}}/deliveries/delivery_123",
+              "raw": "{{base_url}}/deliveries/{{delivery_id}}",
               "host": ["{{base_url}}"],
-              "path": ["deliveries", "delivery_123"]
-            }
+              "path": ["deliveries", "{{delivery_id}}"]
+            },
+            "description": "Obtiene una entrega específica"
           }
         },
         {
           "name": "Update Delivery",
           "request": {
             "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "multipart/form-data"
-              }
-            ],
+            "header": [],
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -259,21 +409,24 @@
               ]
             },
             "url": {
-              "raw": "{{base_url}}/deliveries/delivery_123",
+              "raw": "{{base_url}}/deliveries/{{delivery_id}}",
               "host": ["{{base_url}}"],
-              "path": ["deliveries", "delivery_123"]
-            }
+              "path": ["deliveries", "{{delivery_id}}"]
+            },
+            "description": "Actualiza una entrega existente. Puede agregar nuevos archivos"
           }
         },
         {
           "name": "Approve Delivery",
           "request": {
             "method": "POST",
+            "header": [],
             "url": {
-              "raw": "{{base_url}}/deliveries/delivery_123/approve",
+              "raw": "{{base_url}}/deliveries/{{delivery_id}}/approve",
               "host": ["{{base_url}}"],
-              "path": ["deliveries", "delivery_123", "approve"]
-            }
+              "path": ["deliveries", "{{delivery_id}}", "approve"]
+            },
+            "description": "Aprueba una entrega. Solo el comprador puede aprobar. Envía notificación al vendedor"
           }
         },
         {
@@ -288,103 +441,96 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"feedback\": \"Necesito cambios en el coro\"\n}"
+              "raw": "{\n  \"feedback\": \"Necesito que ajustes el volumen de la guitarra y agregues más reverb en la voz. También faltan los stems separados.\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/deliveries/delivery_123/request-revision",
+              "raw": "{{base_url}}/deliveries/{{delivery_id}}/request-revision",
               "host": ["{{base_url}}"],
-              "path": ["deliveries", "delivery_123", "request-revision"]
-            }
+              "path": ["deliveries", "{{delivery_id}}", "request-revision"]
+            },
+            "description": "Solicita revisión de una entrega. Solo el comprador puede solicitar. Envía notificación al vendedor"
           }
         },
         {
           "name": "Download File",
           "request": {
             "method": "GET",
+            "header": [],
             "url": {
-              "raw": "{{base_url}}/deliveries/delivery_123/files/file_456/download",
+              "raw": "{{base_url}}/deliveries/{{delivery_id}}/files/{{file_id}}/download",
               "host": ["{{base_url}}"],
-              "path": ["deliveries", "delivery_123", "files", "file_456", "download"]
-            }
+              "path": ["deliveries", "{{delivery_id}}", "files", "{{file_id}}", "download"]
+            },
+            "description": "Descarga un archivo específico de una entrega"
           }
         },
         {
           "name": "Get Deliveries by Order",
           "request": {
             "method": "GET",
+            "header": [],
             "url": {
-              "raw": "{{base_url}}/deliveries/order/order_123",
+              "raw": "{{base_url}}/deliveries/order/{{order_id}}",
               "host": ["{{base_url}}"],
-              "path": ["deliveries", "order", "order_123"]
-            }
+              "path": ["deliveries", "order", "{{order_id}}"]
+            },
+            "description": "Obtiene todas las entregas de una orden específica"
           }
         }
       ]
     },
     {
-      "name": "Notifications",
+      "name": "💬 Chat",
+      "description": "Sistema de mensajería entre compradores y vendedores",
       "item": [
         {
-          "name": "Get User Notifications",
+          "name": "List User Chats",
           "request": {
             "method": "GET",
+            "header": [],
             "url": {
-              "raw": "{{base_url}}/notifications",
+              "raw": "{{base_url}}/chats?limit=20&offset=0",
               "host": ["{{base_url}}"],
-              "path": ["notifications"]
-            }
-          }
-        },
-        {
-          "name": "Get Notifications with Pagination",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/notifications?limit=10&offset=0",
-              "host": ["{{base_url}}"],
-              "path": ["notifications"],
+              "path": ["chats"],
               "query": [
                 {
                   "key": "limit",
-                  "value": "10"
+                  "value": "20"
                 },
                 {
                   "key": "offset",
                   "value": "0"
                 }
               ]
-            }
+            },
+            "description": "Obtiene todos los chats del usuario autenticado"
           }
         },
         {
-          "name": "Mark Notification as Read",
+          "name": "Get Chat with Messages",
           "request": {
-            "method": "PATCH",
+            "method": "GET",
+            "header": [],
             "url": {
-              "raw": "{{base_url}}/notifications/notification_123/read",
+              "raw": "{{base_url}}/chats/{{chat_id}}?messagesLimit=50&messagesCursor=",
               "host": ["{{base_url}}"],
-              "path": ["notifications", "notification_123", "read"]
-            }
+              "path": ["chats", "{{chat_id}}"],
+              "query": [
+                {
+                  "key": "messagesLimit",
+                  "value": "50"
+                },
+                {
+                  "key": "messagesCursor",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Obtiene un chat específico con sus mensajes. Incluye paginación de mensajes"
           }
         },
         {
-          "name": "Mark All as Read",
-          "request": {
-            "method": "PATCH",
-            "url": {
-              "raw": "{{base_url}}/notifications/read-all",
-              "host": ["{{base_url}}"],
-              "path": ["notifications", "read-all"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Orders",
-      "item": [
-        {
-          "name": "Create Order",
+          "name": "Send Message",
           "request": {
             "method": "POST",
             "header": [
@@ -395,39 +541,140 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"serviceId\": \"service_123\",\n  \"sellerId\": \"seller_456\",\n  \"amount\": 5000,\n  \"currency\": \"USD\",\n  \"paymentRef\": \"pay_1234567890\"\n}"
+              "raw": "{\n  \"body\": \"¡Hola! Me interesa tu servicio de mezcla. ¿Podrías mostrarme algunos ejemplos de tu trabajo?\",\n  \"attachments\": {\n    \"files\": [\n      {\n        \"url\": \"/chats/files/demo_123456789.mp3\",\n        \"name\": \"demo.mp3\",\n        \"type\": \"audio/mpeg\",\n        \"size\": 2048576\n      }\n    ]\n  }\n}"
             },
             "url": {
-              "raw": "{{base_url}}/orders",
+              "raw": "{{base_url}}/chats/{{chat_id}}/messages",
               "host": ["{{base_url}}"],
-              "path": ["orders"]
-            }
+              "path": ["chats", "{{chat_id}}", "messages"]
+            },
+            "description": "Envía un mensaje al chat. Puede incluir archivos adjuntos"
           }
         },
         {
-          "name": "Get User Orders",
+          "name": "Upload Chat Files",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "files",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/chats/{{chat_id}}/upload",
+              "host": ["{{base_url}}"],
+              "path": ["chats", "{{chat_id}}", "upload"]
+            },
+            "description": "Sube archivos para usar en mensajes del chat. Máximo 5 archivos. Devuelve URLs para usar en mensajes"
+          }
+        },
+        {
+          "name": "Mark Message as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/chats/{{chat_id}}/messages/{{message_id}}/read",
+              "host": ["{{base_url}}"],
+              "path": ["chats", "{{chat_id}}", "messages", "{{message_id}}", "read"]
+            },
+            "description": "Marca un mensaje específico como leído"
+          }
+        },
+        {
+          "name": "Mark All Messages as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/chats/{{chat_id}}/messages/read-all",
+              "host": ["{{base_url}}"],
+              "path": ["chats", "{{chat_id}}", "messages", "read-all"]
+            },
+            "description": "Marca todos los mensajes del chat como leídos"
+          }
+        }
+      ]
+    },
+    {
+      "name": "⭐ Reviews",
+      "description": "Sistema de reseñas y calificaciones",
+      "item": [
+        {
+          "name": "Create Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"{{order_id}}\",\n  \"rating\": 5,\n  \"comment\": \"Excelente trabajo! La mezcla quedó perfecta y la comunicación fue muy fluida. Definitivamente volveré a contratar sus servicios.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/reviews",
+              "host": ["{{base_url}}"],
+              "path": ["reviews"]
+            },
+            "description": "Crea una reseña para una orden completada. Solo el comprador puede reseñar. Rating de 1-5 estrellas"
+          }
+        },
+        {
+          "name": "Get Reviews by Service",
           "request": {
             "method": "GET",
+            "header": [],
             "url": {
-              "raw": "{{base_url}}/orders",
+              "raw": "{{base_url}}/reviews?serviceId={{service_id}}",
               "host": ["{{base_url}}"],
-              "path": ["orders"]
-            }
+              "path": ["reviews"],
+              "query": [
+                {
+                  "key": "serviceId",
+                  "value": "{{service_id}}"
+                }
+              ]
+            },
+            "description": "Obtiene todas las reseñas de un servicio específico"
           }
         },
         {
-          "name": "Get Order by ID",
+          "name": "Get User Reviews",
           "request": {
             "method": "GET",
+            "header": [],
             "url": {
-              "raw": "{{base_url}}/orders/order_123",
+              "raw": "{{base_url}}/reviews",
               "host": ["{{base_url}}"],
-              "path": ["orders", "order_123"]
-            }
+              "path": ["reviews"]
+            },
+            "description": "Obtiene todas las reseñas del usuario autenticado (que escribió o recibió)"
           }
         },
         {
-          "name": "Update Order",
+          "name": "Get Review by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/reviews/{{review_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["reviews", "{{review_id}}"]
+            },
+            "description": "Obtiene una reseña específica"
+          }
+        },
+        {
+          "name": "Update Review",
           "request": {
             "method": "PATCH",
             "header": [
@@ -438,30 +685,130 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"status\": \"COMPLETED\",\n  \"paymentRef\": \"pay_updated_123\"\n}"
+              "raw": "{\n  \"rating\": 4,\n  \"comment\": \"Muy buen trabajo, solo faltó un poco más de punch en la batería\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/orders/order_123",
+              "raw": "{{base_url}}/reviews/{{review_id}}",
               "host": ["{{base_url}}"],
-              "path": ["orders", "order_123"]
-            }
+              "path": ["reviews", "{{review_id}}"]
+            },
+            "description": "Actualiza una reseña existente. Solo el autor puede actualizarla"
           }
         },
         {
-          "name": "Cancel Order",
+          "name": "Delete Review",
           "request": {
             "method": "DELETE",
+            "header": [],
             "url": {
-              "raw": "{{base_url}}/orders/order_123",
+              "raw": "{{base_url}}/reviews/{{review_id}}",
               "host": ["{{base_url}}"],
-              "path": ["orders", "order_123"]
-            }
+              "path": ["reviews", "{{review_id}}"]
+            },
+            "description": "Elimina una reseña. Solo el autor puede eliminarla"
           }
         }
       ]
     },
     {
-      "name": "Payments",
+      "name": "🔔 Notifications",
+      "description": "Sistema de notificaciones en tiempo real",
+      "item": [
+        {
+          "name": "Get User Notifications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/notifications?limit=20&offset=0",
+              "host": ["{{base_url}}"],
+              "path": ["notifications"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Obtiene las notificaciones del usuario autenticado con paginación"
+          }
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/notifications/{{notification_id}}/read",
+              "host": ["{{base_url}}"],
+              "path": ["notifications", "{{notification_id}}", "read"]
+            },
+            "description": "Marca una notificación específica como leída"
+          }
+        },
+        {
+          "name": "Mark All Notifications as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/notifications/read-all",
+              "host": ["{{base_url}}"],
+              "path": ["notifications", "read-all"]
+            },
+            "description": "Marca todas las notificaciones del usuario como leídas"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🎼 Genres",
+      "description": "Gestión de géneros musicales",
+      "item": [
+        {
+          "name": "List Genres",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/genres",
+              "host": ["{{base_url}}"],
+              "path": ["genres"]
+            },
+            "description": "Obtiene todos los géneros musicales disponibles"
+          }
+        },
+        {
+          "name": "Create Genre",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Flamenco\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/genres",
+              "host": ["{{base_url}}"],
+              "path": ["genres"]
+            },
+            "description": "Crea un nuevo género musical. Solo administradores pueden crear géneros"
+          }
+        }
+      ]
+    },
+    {
+      "name": "💳 Payments",
+      "description": "Gestión de pagos (estructura básica)",
       "item": [
         {
           "name": "Create Payment",
@@ -475,70 +822,59 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"orderId\": \"order_123\",\n  \"paymentMethod\": \"stripe\",\n  \"amount\": 5000,\n  \"currency\": \"USD\",\n  \"paymentIntentId\": \"pi_1234567890\",\n  \"transactionId\": \"txn_1234567890\",\n  \"description\": \"Pago por servicio de música\"\n}"
+              "raw": "{\n  \"orderId\": \"{{order_id}}\",\n  \"amount\": 5000,\n  \"currency\": \"USD\",\n  \"paymentMethod\": \"stripe\",\n  \"description\": \"Pago por servicio de mezcla\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/payments",
               "host": ["{{base_url}}"],
               "path": ["payments"]
-            }
+            },
+            "description": "Crea un nuevo pago para una orden"
           }
         },
         {
           "name": "Get User Payments",
           "request": {
             "method": "GET",
+            "header": [],
             "url": {
               "raw": "{{base_url}}/payments",
               "host": ["{{base_url}}"],
               "path": ["payments"]
-            }
-          }
-        },
-        {
-          "name": "Get Payment by ID",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/payments/payment_123",
-              "host": ["{{base_url}}"],
-              "path": ["payments", "payment_123"]
-            }
-          }
-        },
-        {
-          "name": "Update Payment",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"status\": \"completed\",\n  \"transactionId\": \"txn_updated_123\"\n}"
             },
-            "url": {
-              "raw": "{{base_url}}/payments/payment_123",
-              "host": ["{{base_url}}"],
-              "path": ["payments", "payment_123"]
-            }
-          }
-        },
-        {
-          "name": "Process Refund",
-          "request": {
-            "method": "POST",
-            "url": {
-              "raw": "{{base_url}}/payments/payment_123/refund",
-              "host": ["{{base_url}}"],
-              "path": ["payments", "payment_123", "refund"]
-            }
+            "description": "Obtiene todos los pagos del usuario autenticado"
           }
         }
       ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Auto-generate variables if needed",
+          "if (!pm.variables.get('service_id')) {",
+          "    pm.variables.set('service_id', 'cmgfge54x000gfw3wtwlolbxp');",
+          "}",
+          "if (!pm.variables.get('order_id')) {",
+          "    pm.variables.set('order_id', 'cmgtpt82u0001fws0lji1pook');",
+          "}",
+          "if (!pm.variables.get('chat_id')) {",
+          "    pm.variables.set('chat_id', 'cmgtpt8360003fws0dnyhwfb1');",
+          "}",
+          "if (!pm.variables.get('delivery_id')) {",
+          "    pm.variables.set('delivery_id', 'delivery_123456');",
+          "}",
+          "if (!pm.variables.get('review_id')) {",
+          "    pm.variables.set('review_id', 'review_123456');",
+          "}",
+          "if (!pm.variables.get('notification_id')) {",
+          "    pm.variables.set('notification_id', 'notification_123456');",
+          "}"
+        ]
+      }
     }
   ]
 }
