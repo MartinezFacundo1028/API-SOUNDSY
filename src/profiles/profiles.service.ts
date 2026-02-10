@@ -15,6 +15,12 @@ export class ProfilesService {
             name: true,
           },
         },
+        user: {
+          select: {
+            averageRatingAsMusician: true,
+            totalReviewsAsMusician: true,
+          },
+        },
       },
     });
 
@@ -85,6 +91,12 @@ export class ProfilesService {
             name: true,
           },
         },
+        user: {
+          select: {
+            averageRatingAsMusician: true,
+            totalReviewsAsMusician: true,
+          },
+        },
       },
     });
 
@@ -101,6 +113,8 @@ export class ProfilesService {
       instruments: profile.instruments || [],
       links: (profile.links as Record<string, string>) || undefined,
       genres: profile.genres || [],
+      averageRatingAsMusician: profile.user?.averageRatingAsMusician ?? 0,
+      totalReviewsAsMusician: profile.user?.totalReviewsAsMusician ?? 0,
     };
   }
 }

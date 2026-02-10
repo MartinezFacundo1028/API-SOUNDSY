@@ -34,4 +34,10 @@ export class ProfileResponseDto {
     description: 'Géneros musicales del perfil',
   })
   genres: { name: string }[];
+
+  @ApiProperty({ example: 4.5, description: 'Rating promedio como músico (0-5)' })
+  averageRatingAsMusician: number;
+
+  @ApiProperty({ example: 12, description: 'Total de reseñas como músico' })
+  totalReviewsAsMusician: number;
 }

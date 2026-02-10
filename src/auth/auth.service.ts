@@ -56,6 +56,10 @@ export class AuthService {
         id: user.id,
         email: user.email,
         role: user.role,
+        displayName: user.profile?.displayName ?? undefined,
+        createdAt: user.createdAt.toISOString(),
+        averageRatingAsMusician: user.averageRatingAsMusician ?? 0,
+        totalReviewsAsMusician: user.totalReviewsAsMusician ?? 0,
         profile: user.profile
           ? {
               displayName: user.profile.displayName,
@@ -77,7 +81,9 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new UnauthorizedException('Credenciales incorrectas');
+      throw new NotFoundException(
+        'No hay ninguna cuenta registrada con ese correo electrónico.',
+      );
     }
 
     // Verificar la contraseña
@@ -87,7 +93,7 @@ export class AuthService {
     );
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Credenciales incorrectas');
+      throw new UnauthorizedException('La contraseña es incorrecta.');
     }
 
     // Generar JWT
@@ -99,6 +105,10 @@ export class AuthService {
         id: user.id,
         email: user.email,
         role: user.role,
+        displayName: user.profile?.displayName ?? undefined,
+        createdAt: user.createdAt.toISOString(),
+        averageRatingAsMusician: user.averageRatingAsMusician ?? 0,
+        totalReviewsAsMusician: user.totalReviewsAsMusician ?? 0,
         profile: user.profile
           ? {
               displayName: user.profile.displayName,
@@ -126,6 +136,10 @@ export class AuthService {
       id: user.id,
       email: user.email,
       role: user.role,
+      displayName: user.profile?.displayName ?? undefined,
+      createdAt: user.createdAt.toISOString(),
+      averageRatingAsMusician: user.averageRatingAsMusician ?? 0,
+      totalReviewsAsMusician: user.totalReviewsAsMusician ?? 0,
       profile: user.profile
         ? {
             displayName: user.profile.displayName,

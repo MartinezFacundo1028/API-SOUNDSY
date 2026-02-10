@@ -15,6 +15,10 @@ export class AuthResponseDto {
     id: string;
     email: string;
     role: Role;
+    displayName?: string;
+    createdAt: string;
+    averageRatingAsMusician: number;
+    totalReviewsAsMusician: number;
     profile?: {
       displayName: string | null;
       bio: string | null;

@@ -1,9 +1,23 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class GenresService {
   constructor(private prisma: PrismaService) {}
+
+  async create(name: string) {
+    const normalized = name.trim();
+    const existing = await this.prisma.genre.findUnique({
+      where: { name: normalized },
+    });
+    if (existing) {
+      throw new ConflictException(`Ya existe un género con el nombre "${normalized}"`);
+    }
+    return this.prisma.genre.create({
+      data: { name: normalized },
+    });
+  }
+
   async list() {
     return await this.prisma.genre.findMany({ orderBy: { name: 'asc' } });
   }

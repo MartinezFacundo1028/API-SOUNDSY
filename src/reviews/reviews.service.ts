@@ -57,6 +57,8 @@ export class ReviewsService {
 
     // Actualizar el rating promedio del servicio
     await this.updateServiceRating(order.serviceId);
+    // Actualizar métricas de rating del músico (vendedor)
+    await this.updateMusicianRating(order.sellerId);
 
     return this.mapToResponseDto(review);
   }
@@ -173,6 +175,8 @@ export class ReviewsService {
 
     // Actualizar el rating promedio del servicio
     await this.updateServiceRating(review.order.serviceId);
+    // Actualizar métricas de rating del músico (vendedor)
+    await this.updateMusicianRating(review.order.sellerId);
 
     return this.mapToResponseDto(updatedReview);
   }
@@ -198,6 +202,31 @@ export class ReviewsService {
 
     // Actualizar el rating promedio del servicio
     await this.updateServiceRating(review.order.serviceId);
+    // Actualizar métricas de rating del músico (vendedor)
+    await this.updateMusicianRating(review.order.sellerId);
+  }
+
+  private async updateMusicianRating(sellerId: string): Promise<void> {
+    const agg = await this.prisma.review.aggregate({
+      where: {
+        order: {
+          sellerId,
+        },
+      },
+      _count: { id: true },
+      _avg: { rating: true },
+    });
+
+    const totalReviewsAsMusician = agg._count.id;
+    const averageRatingAsMusician = agg._avg.rating ?? 0;
+
+    await this.prisma.user.update({
+      where: { id: sellerId },
+      data: {
+        totalReviewsAsMusician,
+        averageRatingAsMusician,
+      },
+    });
   }
 
   private async updateServiceRating(serviceId: string): Promise<void> {
