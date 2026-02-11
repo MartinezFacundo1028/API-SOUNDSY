@@ -32,6 +32,10 @@ export class OrdersService {
       throw new BadRequestException('El vendedor no es el propietario del servicio');
     }
 
+    const initialStatus = dto.asRequest === true
+      ? OrderStatus.REQUESTED
+      : OrderStatus.PENDING_PAYMENT;
+
     // Crear la orden
     const order = await this.prisma.order.create({
       data: {
@@ -41,7 +45,7 @@ export class OrdersService {
         amount: dto.amount,
         currency: dto.currency,
         paymentRef: dto.paymentRef,
-        status: OrderStatus.PENDING_PAYMENT,
+        status: initialStatus,
       },
       include: {
         service: {
@@ -196,6 +200,17 @@ export class OrdersService {
       throw new ForbiddenException('No tienes permisos para actualizar esta orden');
     }
 
+    // Solo el vendedor (o admin) puede pasar REQUESTED → PENDING_PAYMENT
+    if (
+      dto.status !== undefined &&
+      order.status === OrderStatus.REQUESTED &&
+      dto.status === OrderStatus.PENDING_PAYMENT
+    ) {
+      if (userRole !== 'ADMIN' && order.sellerId !== userId) {
+        throw new ForbiddenException('Solo el músico puede aprobar la solicitud');
+      }
+    }
+
     const updatedOrder = await this.prisma.order.update({
       where: { id },
       data: dto,
@@ -234,19 +249,76 @@ export class OrdersService {
       throw new NotFoundException('Orden no encontrada');
     }
 
-    // Solo el comprador o admin pueden cancelar
-    if (userRole !== 'ADMIN' && order.buyerId !== userId) {
-      throw new ForbiddenException('Solo el comprador puede cancelar la orden');
+    const canCancelPayment = order.status === OrderStatus.PENDING_PAYMENT;
+    const canCancelRequest = order.status === OrderStatus.REQUESTED;
+
+    if (!canCancelPayment && !canCancelRequest) {
+      throw new BadRequestException('Solo se pueden cancelar órdenes en estado solicitud o pendiente de pago');
     }
 
-    // Solo se puede cancelar si está pendiente de pago
-    if (order.status !== OrderStatus.PENDING_PAYMENT) {
-      throw new BadRequestException('Solo se pueden cancelar órdenes pendientes de pago');
+    // PENDING_PAYMENT: solo comprador (o admin). REQUESTED: comprador o vendedor (o admin)
+    if (userRole !== 'ADMIN' && order.buyerId !== userId && order.sellerId !== userId) {
+      throw new ForbiddenException('No tienes permisos para cancelar esta orden');
+    }
+    if (order.status === OrderStatus.PENDING_PAYMENT && userRole !== 'ADMIN' && order.buyerId !== userId) {
+      throw new ForbiddenException('Solo el comprador puede cancelar la orden pendiente de pago');
     }
 
     await this.prisma.order.delete({
       where: { id },
     });
+  }
+
+  /** Solo el vendedor puede aprobar una solicitud (REQUESTED → PENDING_PAYMENT). */
+  async approveRequest(id: string, userId: string, userRole: string): Promise<OrderResponseDto> {
+    const order = await this.prisma.order.findUnique({
+      where: { id },
+      include: {
+        service: { include: { owner: { include: { profile: true } } } },
+        buyer: { include: { profile: true } },
+        seller: { include: { profile: true } },
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException('Orden no encontrada');
+    }
+
+    if (order.status !== OrderStatus.REQUESTED) {
+      throw new BadRequestException('Solo se puede aprobar una orden en estado solicitud');
+    }
+
+    if (userRole !== 'ADMIN' && order.sellerId !== userId) {
+      throw new ForbiddenException('Solo el músico puede aprobar la solicitud');
+    }
+
+    const updatedOrder = await this.prisma.order.update({
+      where: { id },
+      data: { status: OrderStatus.PENDING_PAYMENT },
+      include: {
+        service: {
+          include: {
+            owner: {
+              include: {
+                profile: true,
+              },
+            },
+          },
+        },
+        buyer: {
+          include: {
+            profile: true,
+          },
+        },
+        seller: {
+          include: {
+            profile: true,
+          },
+        },
+      },
+    });
+
+    return this.mapToResponseDto(updatedOrder);
   }
 
   private mapToResponseDto(order: any): OrderResponseDto {

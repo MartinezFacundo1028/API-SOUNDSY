@@ -23,7 +23,9 @@ export class PaymentsService {
       throw new ForbiddenException('Solo el comprador puede procesar el pago');
     }
 
-    // Verificar que la orden está pendiente de pago
+    if (order.status === OrderStatus.REQUESTED) {
+      throw new BadRequestException('La orden debe ser aprobada por el músico antes de pagar');
+    }
     if (order.status !== OrderStatus.PENDING_PAYMENT) {
       throw new BadRequestException('La orden no está pendiente de pago');
     }

@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsInt, Min } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsInt, Min, IsBoolean } from 'class-validator';
 
 export class CreateOrderDto {
   @IsString()
@@ -20,4 +20,9 @@ export class CreateOrderDto {
   @IsString()
   @IsOptional()
   paymentRef?: string;
+
+  /** Si true, la orden se crea como solicitud (REQUESTED) para que el músico apruebe antes de pagar */
+  @IsBoolean()
+  @IsOptional()
+  asRequest?: boolean;
 }

@@ -13,14 +13,20 @@ const MP_API_BASE = 'https://api.mercadopago.com';
 @Injectable()
 export class MercadoPagoService {
   private readonly accessToken: string;
+  /** URL del frontend: usada para back_urls (success, failure, pending). */
   private readonly appUrl: string;
+  /** URL de esta API: usada para notification_url (webhook). Si no se define, se usa appUrl. */
+  private readonly apiUrl: string;
 
   constructor(
     private config: ConfigService,
     private prisma: PrismaService,
   ) {
     this.accessToken = this.config.get<string>('MERCADOPAGO_ACCESS_TOKEN', '');
-    this.appUrl = this.config.get<string>('APP_URL', 'http://localhost:3001');
+    // APP_URL = URL del frontend (a donde Mercado Pago redirige al usuario).
+    this.appUrl = this.config.get<string>('APP_URL', 'http://localhost:3000');
+    // API_URL = URL de esta API (para que MP llame al webhook). En dev: http://localhost:3001
+    this.apiUrl = this.config.get<string>('API_URL', this.appUrl);
   }
 
   /**
@@ -51,6 +57,11 @@ export class MercadoPagoService {
       throw new ForbiddenException('Solo el comprador puede pagar esta orden');
     }
 
+    if (order.status === OrderStatus.REQUESTED) {
+      throw new BadRequestException(
+        'La orden debe ser aprobada por el músico antes de pagar',
+      );
+    }
     if (order.status !== OrderStatus.PENDING_PAYMENT) {
       throw new BadRequestException(
         'La orden no está pendiente de pago',
@@ -80,10 +91,18 @@ export class MercadoPagoService {
       },
     });
 
-    const notificationUrl = `${this.appUrl}/api/v1/payments/mercadopago/webhook`;
-    const backUrlSuccess = `${this.appUrl}/payment/success?orderId=${orderId}`;
-    const backUrlPending = `${this.appUrl}/payment/pending?orderId=${orderId}`;
-    const backUrlFailure = `${this.appUrl}/payment/failure?orderId=${orderId}`;
+    const frontUrl = (this.appUrl || '').replace(/\/$/, '');
+    if (!frontUrl || frontUrl.includes('undefined')) {
+      throw new BadRequestException(
+        'APP_URL no está configurada. Definí APP_URL en .env con la URL del frontend (ej: http://localhost:3000).',
+      );
+    }
+
+    const apiBase = (this.apiUrl || '').replace(/\/$/, '');
+    const notificationUrl = `${apiBase}/api/v1/payments/mercadopago/webhook`;
+    const backUrlSuccess = `${frontUrl}/payment/success?orderId=${orderId}`;
+    const backUrlPending = `${frontUrl}/payment/pending?orderId=${orderId}`;
+    const backUrlFailure = `${frontUrl}/payment/failure?orderId=${orderId}`;
 
     const body = {
       items: [

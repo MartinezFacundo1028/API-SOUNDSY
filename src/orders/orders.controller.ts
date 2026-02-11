@@ -42,6 +42,14 @@ export class OrdersController {
     return this.ordersService.getOrderById(id, user.id, user.role);
   }
 
+  @Patch(':id/approve-request')
+  async approveRequest(
+    @Param('id') id: string,
+    @CurrentUser() user: any,
+  ): Promise<OrderResponseDto> {
+    return this.ordersService.approveRequest(id, user.id, user.role);
+  }
+
   @Patch(':id')
   async updateOrder(
     @Param('id') id: string,
