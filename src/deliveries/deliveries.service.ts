@@ -1,4 +1,6 @@
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import * as fs from 'fs';
+import * as path from 'path';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateDeliveryDto, UpdateDeliveryDto, DeliveryResponseDto } from './dto';
 import { DeliveryStatus } from '@prisma/client';
@@ -344,19 +346,30 @@ export class DeliveriesService {
       throw new ForbiddenException('No tienes permisos para descargar este archivo');
     }
 
-    // Buscar el archivo en la entrega
     const files = delivery.files as any[];
-    const file = files.find(f => f.id === fileId);
+    const file = files.find((f) => f.id === fileId);
     if (!file) {
       throw new NotFoundException('Archivo no encontrado');
     }
 
-    // Aquí implementarías la lógica de descarga real
-    // Por ahora retornamos datos mock
+    const filePath = file.path;
+    if (!filePath || typeof filePath !== 'string') {
+      throw new NotFoundException('Archivo no disponible (entrega antigua sin archivo en disco)');
+    }
+
+    const absolutePath = path.isAbsolute(filePath) ? filePath : path.join(process.cwd(), filePath);
+    if (!fs.existsSync(absolutePath)) {
+      throw new NotFoundException('Archivo no encontrado en el servidor');
+    }
+
+    const buffer = fs.readFileSync(absolutePath);
+    const filename = file.filename || file.name || 'archivo';
+    const mimeType = file.mimeType || 'application/octet-stream';
+
     return {
-      file: Buffer.from('mock file content'),
-      filename: file.filename,
-      mimeType: file.mimeType
+      file: buffer,
+      filename,
+      mimeType,
     };
   }
 

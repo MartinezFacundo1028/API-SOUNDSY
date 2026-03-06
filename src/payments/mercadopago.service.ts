@@ -104,7 +104,8 @@ export class MercadoPagoService {
     const backUrlPending = `${frontUrl}/payment/pending?orderId=${orderId}`;
     const backUrlFailure = `${frontUrl}/payment/failure?orderId=${orderId}`;
 
-    const body = {
+    // Cuerpo base de la preferencia
+    const body: any = {
       items: [
         {
           id: order.serviceId,
@@ -124,10 +125,16 @@ export class MercadoPagoService {
         failure: backUrlFailure,
         pending: backUrlPending,
       },
-      auto_return: 'approved' as const,
       external_reference: orderId,
       notification_url: notificationUrl,
     };
+
+    // auto_return solo cuando la URL de success es HTTPS.
+    // En algunos entornos de Mercado Pago, usar auto_return con URLs http o inválidas
+    // dispara errores del tipo "auto_return invalid. back_url.success must be defined".
+    if (backUrlSuccess.startsWith('https://')) {
+      body.auto_return = 'approved' as const;
+    }
 
     const res = await fetch(`${MP_API_BASE}/checkout/preferences`, {
       method: 'POST',

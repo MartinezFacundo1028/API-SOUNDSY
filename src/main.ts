@@ -13,7 +13,7 @@ async function bootstrap(): Promise<void> {
     origin: [...corsOrigins, ...extraOrigins],
     credentials: true,
     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning'],
   });
 
   // Prefijo + versionado
