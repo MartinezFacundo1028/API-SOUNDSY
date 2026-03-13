@@ -3,6 +3,7 @@ import {
   Get,
   Patch,
   Body,
+  Param,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -19,12 +20,24 @@ import type { CurrentUserType } from '../auth/decorators/current-user.decorator'
 
 @ApiTags('Profiles')
 @Controller({ path: 'profile', version: '1' })
-@UseGuards(JwtAuthGuard)
-@ApiBearerAuth()
 export class ProfilesController {
   constructor(private profilesService: ProfilesService) {}
 
+  @Get(':id')
+  @ApiOperation({
+    summary: 'Obtener perfil público de un usuario (sin auth)',
+    description:
+      'Obtiene los datos públicos del perfil de cualquier usuario/músico por su userId. No requiere autenticación.',
+  })
+  @ApiResponse({ status: 200, description: 'Perfil público', type: ProfileResponseDto })
+  @ApiResponse({ status: 404, description: 'Perfil no encontrado' })
+  async getPublicProfile(@Param('id') id: string): Promise<ProfileResponseDto> {
+    return await this.profilesService.getPublicProfile(id);
+  }
+
   @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Obtener perfil del usuario autenticado',
     description: 'Obtiene el perfil completo del usuario autenticado, incluyendo géneros e instrumentos',
@@ -45,6 +58,8 @@ export class ProfilesController {
   }
 
   @Patch()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Actualizar perfil del usuario autenticado',
     description: 'Actualiza el perfil del usuario. Solo se actualizan los campos enviados.',

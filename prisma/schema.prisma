@@ -68,6 +68,8 @@ model Profile {
   avatarUrl   String?
   instruments String[]
   links       Json?
+  location    String?
+  languages   String[]
   genres      Genre[]  @relation("ProfileGenres")
 }
 

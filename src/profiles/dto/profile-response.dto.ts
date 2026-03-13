@@ -20,6 +20,20 @@ export class ProfileResponseDto {
   instruments: string[];
 
   @ApiProperty({
+    example: 'Buenos Aires, Argentina',
+    description: 'Ubicación del músico',
+    required: false,
+  })
+  location?: string;
+
+  @ApiProperty({
+    example: ['Español', 'Inglés'],
+    description: 'Idiomas que habla el músico',
+    required: false,
+  })
+  languages?: string[];
+
+  @ApiProperty({
     example: {
       spotify: 'https://spotify.com/artist/demo',
       soundcloud: 'https://soundcloud.com/demo',

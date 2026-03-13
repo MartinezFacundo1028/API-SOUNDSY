@@ -6,11 +6,11 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
 
-  // CORS: localhost + orígenes extra desde env (ej. ngrok para probar desde URL pública)
-  const corsOrigins: string[] = ['http://localhost:3000'];
-  const extraOrigins = process.env.CORS_ORIGINS?.split(',').map((o) => o.trim()).filter(Boolean) ?? [];
+  // CORS: en desarrollo permite cualquier origen; en producción usa CORS_ORIGINS
+  const isProd = process.env.NODE_ENV === 'production';
+  const prodOrigins = process.env.CORS_ORIGINS?.split(',').map((o) => o.trim()).filter(Boolean) ?? [];
   app.enableCors({
-    origin: [...corsOrigins, ...extraOrigins],
+    origin: isProd && prodOrigins.length > 0 ? prodOrigins : true,
     credentials: true,
     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning'],

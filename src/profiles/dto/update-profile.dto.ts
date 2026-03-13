@@ -64,4 +64,24 @@ export class UpdateProfileDto {
   @IsArray()
   @IsString({ each: true })
   genres?: string[];
+
+  @ApiProperty({
+    description: 'Ubicación del músico',
+    example: 'Buenos Aires, Argentina',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  location?: string;
+
+  @ApiProperty({
+    description: 'Idiomas que habla el músico',
+    example: ['Español', 'Inglés'],
+    required: false,
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  languages?: string[];
 }

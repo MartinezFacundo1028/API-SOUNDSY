@@ -6,6 +6,28 @@ import { UpdateProfileDto, ProfileResponseDto } from './dto';
 export class ProfilesService {
   constructor(private prisma: PrismaService) {}
 
+  /** Perfil público de cualquier usuario por ID (userId). Sin auth. */
+  async getPublicProfile(userId: string): Promise<ProfileResponseDto> {
+    const profile = await this.prisma.profile.findUnique({
+      where: { userId },
+      include: {
+        genres: { select: { name: true } },
+        user: {
+          select: {
+            averageRatingAsMusician: true,
+            totalReviewsAsMusician: true,
+          },
+        },
+      },
+    });
+
+    if (!profile) {
+      throw new NotFoundException('Perfil no encontrado');
+    }
+
+    return this.mapToResponseDto(profile);
+  }
+
   async getProfile(userId: string): Promise<ProfileResponseDto> {
     const profile = await this.prisma.profile.findUnique({
       where: { userId },
@@ -55,6 +77,8 @@ export class ProfilesService {
     if (dto.avatarUrl !== undefined) updateData.avatarUrl = dto.avatarUrl;
     if (dto.instruments !== undefined) updateData.instruments = dto.instruments;
     if (dto.links !== undefined) updateData.links = dto.links;
+    if (dto.location !== undefined) updateData.location = dto.location;
+    if (dto.languages !== undefined) updateData.languages = dto.languages;
 
     // Manejo de géneros
     if (dto.genres && dto.genres.length > 0) {
@@ -113,6 +137,8 @@ export class ProfilesService {
       instruments: profile.instruments || [],
       links: (profile.links as Record<string, string>) || undefined,
       genres: profile.genres || [],
+      location: profile.location || undefined,
+      languages: profile.languages || [],
       averageRatingAsMusician: profile.user?.averageRatingAsMusician ?? 0,
       totalReviewsAsMusician: profile.user?.totalReviewsAsMusician ?? 0,
     };
