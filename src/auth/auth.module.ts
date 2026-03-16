@@ -17,7 +17,7 @@ import { ConfigModule } from '@nestjs/config';
     JwtModule.register({
       secret: process.env.JWT_SECRET, // En producción usar variable de entorno
       signOptions: {
-        expiresIn: process.env.JWT_EXPIRES_IN, // Token válido por 7 días
+        expiresIn: (process.env.JWT_EXPIRES_IN ?? '7d') as any,
       },
     }),
   ],
