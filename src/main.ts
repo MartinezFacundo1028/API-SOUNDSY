@@ -43,10 +43,10 @@ async function bootstrap(): Promise<void> {
       .build(),
   );
   SwaggerModule.setup('api/docs', app, document);
-  // Docs: http://localhost:3001/api/docs
-  // JSON: http://localhost:3001/api/docs-json
+  // Docs: http://localhost:${process.env.PORT}/api/docs
+  // JSON: http://localhost:${process.env.PORT}/api/docs-json
 
-  await app.listen(3001);
+  await app.listen(Number(process.env.PORT) || 3001);
 }
 
 void bootstrap();
